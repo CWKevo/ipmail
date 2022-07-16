@@ -1,6 +1,0 @@
-{
-  "devDependencies": {
-    "tailwindcss": "*",
-    "clean-css-cli": "*"
-  }
-}

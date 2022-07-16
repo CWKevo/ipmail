@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block content %}
+<a href="{{ url_for('main.index') }}">Back to index</a>
+<br/>
+<br/>
+
+<fieldset>
+    <legend><b>List of {{ state or 'your' }} IPmails</b> (page <code>{{ current_page }}</code>)</legend>
+
+    <section>
+        {% if ipmails|length < 1 %}
+            <p>There are no IPMails to display.</p>
+        {% else %}
+            {% for ipmail in ipmails %}
+            <article>
+                <header>
+                    <h1>Subject: {{ ipmail.subject or "(no subject)" }}</h1>
+                    <i>#{{ ipmail.id }} | Sender: {{ ipmail.from_ip }} | Recipient: {{ ipmail.for_ip }} | {{ state|title or 'Created' }} at: {{ ipmail.created_at }}</i>
+                </header>
+
+                {% autoescape false %}
+                <blockquote>{{ ipmail.content | e | replace("\n", "<br/>") }}</blockquote>
+                {% endautoescape %}
+            </article>
+            <br/>
+
+            {% if ipmail.for_ip == request.remote_addr %}
+            <form action="{{ url_for('main.remove_ipmail') }}" method="POST">
+                <input type="hidden" name="id", value="{{ ipmail.id }}">
+                <button type="submit" {% if not ipmail.visible_for_recipient %}disabled{% endif %}>Remove from my received inbox</button>
+            </form>
+            {% endif %}
+            <hr/>
+            {% endfor %}
+        {% endif %}
+    </section>
+</fieldset>
+
+<br/>
+<br/>
+
+<section>
+    {% if current_page > 1 %}
+        <a href="?page={{ current_page - 1 }}">Previous page</a>
+    {% endif %}
+
+    <a href="?page={{ current_page + 1 }}">Next page</a>
+</section>
+{% endblock content %}
